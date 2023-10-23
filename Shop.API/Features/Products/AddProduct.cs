@@ -79,23 +79,21 @@ public static class AddProduct
 
 public class AddProductModule : ICarterModule
 {
-    private const string Route = "/products";
+    private const string _route = "/products";
     public void AddRoutes(IEndpointRouteBuilder app)
-    {
-        app
+    =>  app
             .MapPost<AddProduct.Command>(
-            Route,
+            _route,
             async (ISender sender, AddProduct.Command command) =>
             {
                 var response = await sender.Send(command);
 
-                return Results.Created(Route, response);
+                return Results.Created(_route, response);
             })
            .IncludeInOpenApi()
            .Produces<AddProduct.Response>(StatusCodes.Status201Created)
            .ProducesProblem(StatusCodes.Status401Unauthorized)
-           .ProducesProblem(StatusCodes.Status422UnprocessableEntity);
-    }
+           .ProducesProblem(StatusCodes.Status422UnprocessableEntity);    
 }
 
 

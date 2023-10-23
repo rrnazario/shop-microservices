@@ -33,7 +33,7 @@ public sealed class OutboxMessagesProcessorJob : IJob
         foreach (var message in messages)
         {
             var domainEvent = JsonConvert
-                .DeserializeObject<IDomainEvent>(message.Content, new JsonSerializerSettings
+                .DeserializeObject<IDomainEvent>(message.Content!, new JsonSerializerSettings
                 {
                     TypeNameHandling = TypeNameHandling.All
                 });

@@ -10,28 +10,26 @@ public record OrderCancelled(Guid OrderId, string Reason);
 public class ProcessOrderConsumer : IConsumer<ProcessOrder>
 {
     public async Task Consume(ConsumeContext<ProcessOrder> context)
-    {
-        await context.RespondAsync(new OrderProcessed(context.Message.OrderId, context.Message.ProcessingId));
-    }
+      => await context.RespondAsync(new OrderProcessed(context.Message.OrderId, context.Message.ProcessingId));
 }
 public class BuyingState : SagaStateMachineInstance
 {
     public Guid CorrelationId { get; set; }
-    public string CurrentState { get; set; }
+    public string? CurrentState { get; set; }
     public Guid? ProcessingId { get; set; }
     public Guid? RequestId { get; set; }
-    public Uri ResponseAddress { get; set; }
+    public Uri? ResponseAddress { get; set; }
     public Guid OrderId { get; set; }
 }
 public class BuyingStateMachine : MassTransitStateMachine<BuyingState>
 {
-    public State Created { get; set; }
+    public State? Created { get; set; }
 
-    public State Cancelled { get; set; }
+    public State? Cancelled { get; set; }
 
-    public Event<CreateOrder> OrderSubmitted { get; set; }
+    public Event<CreateOrder>? OrderSubmitted { get; set; }
 
-    public Request<BuyingState, ProcessOrder, OrderProcessed> ProcessOrder { get; set; }
+    public Request<BuyingState, ProcessOrder, OrderProcessed>? ProcessOrder { get; set; }
 
     public BuyingStateMachine()
     {
@@ -59,21 +57,21 @@ public class BuyingStateMachine : MassTransitStateMachine<BuyingState>
                 .TransitionTo(Created)
                 .ThenAsync(async context =>
                 {
-                    var endpoint = await context.GetSendEndpoint(context.Saga.ResponseAddress);
+                    var endpoint = await context.GetSendEndpoint(context.Saga.ResponseAddress!);
                     await endpoint.Send(context.Saga, r => r.RequestId = context.Saga.RequestId);
                 }),
             When(ProcessOrder.Faulted)
                 .TransitionTo(Cancelled)
                 .ThenAsync(async context =>
                 {
-                    var endpoint = await context.GetSendEndpoint(context.Saga.ResponseAddress);
+                    var endpoint = await context.GetSendEndpoint(context.Saga.ResponseAddress!);
                     await endpoint.Send(new OrderCancelled(context.Saga.OrderId, "Faulted"), r => r.RequestId = context.Saga.RequestId);
                 }),
             When(ProcessOrder.TimeoutExpired)
                 .TransitionTo(Cancelled)
                 .ThenAsync(async context =>
                 {
-                    var endpoint = await context.GetSendEndpoint(context.Saga.ResponseAddress);
+                    var endpoint = await context.GetSendEndpoint(context.Saga.ResponseAddress!);
                     await endpoint.Send(new OrderCancelled(context.Saga.OrderId, "Time-out"), r => r.RequestId = context.Saga.RequestId);
                 }));
     }
