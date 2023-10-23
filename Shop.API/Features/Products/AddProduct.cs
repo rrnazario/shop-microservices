@@ -3,7 +3,6 @@ using Carter.OpenApi;
 using FluentValidation;
 using MassTransit;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Shop.Common.Contracts;
 using Shop.Domain.Interfaces;
 using Shop.Domain.Model;

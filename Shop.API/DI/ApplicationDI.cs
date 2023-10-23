@@ -1,12 +1,7 @@
 ﻿using Asp.Versioning;
 using Carter;
 using Carter.OpenApi;
-using MassTransit;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using Shop.API.Features.Products;
-using Shop.Common;
-using Shop.Common.StateMachines;
 using System.Reflection;
 
 namespace Shop.API.DI;
@@ -40,26 +35,6 @@ public static class ApplicationDI
             options.ReportApiVersions = true;
             options.AssumeDefaultVersionWhenUnspecified = true;
             options.ApiVersionReader = new HeaderApiVersionReader("X-Api-Version");
-        });
-
-        builder.Services.AddMassTransit(config =>
-        {
-            var mqOptions = builder.Configuration.GetSection("MessageQueue").Get<MQOptions>()!;
-            config.SetKebabCaseEndpointNameFormatter();
-
-            config.UsingRabbitMq((ctx, rabbitConfig) =>
-            {
-                rabbitConfig.Host(new Uri(mqOptions.Host), host =>
-                {
-                    host.Username(mqOptions.User);
-                    host.Password(mqOptions.Password);
-                });
-
-                rabbitConfig.ConfigureEndpoints(ctx);
-            });
-
-            config.AddSagaStateMachine<BuyProductStateMachine, BuyProductState>()
-                .InMemoryRepository();
         });
     }    
 

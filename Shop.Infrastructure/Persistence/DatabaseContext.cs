@@ -1,9 +1,5 @@
-﻿using MassTransit;
-using MassTransit.EntityFrameworkCoreIntegration;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using Microsoft.EntityFrameworkCore;
 using Shop.Domain.Model;
-using Shop.Infrastructure.Model;
 using OutboxMessage = Shop.Infrastructure.Model.OutboxMessage;
 
 namespace Shop.Infrastructure.Persistence;

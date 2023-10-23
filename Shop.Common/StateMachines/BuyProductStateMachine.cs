@@ -12,12 +12,12 @@ public class BuyProductState : SagaStateMachineInstance
 {
     public Guid CorrelationId { get; set; }
     public Guid? RequestId { get; set; }
-    public string CurrentState { get; set; }
+    public string? CurrentState { get; set; }
     public Guid? ProcessingId { get; set; }
     public Guid ProductId { get; set; }
     public int Amount { get; set; }
 
-    public Uri ResponseAddress { get; set; }
+    public Uri? ResponseAddress { get; set; }
 }
 
 public class BuyProductStateMachine
