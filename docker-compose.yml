@@ -1,0 +1,68 @@
+version: '3'
+services:
+  shop-api:
+    container_name: 'shop-api'
+    image: 'shop-api'
+    build:
+      context: .
+      dockerfile: Shop.API/Dockerfile
+    ports:
+      - '9080:80'
+    depends_on:
+      - 'postgres'
+      - 'rabbitmq'    
+    profiles: ["full", "api"]
+
+  shop-inventory-api:
+    container_name: 'shop-inventory'
+    image: 'shop-inventory'
+    build:
+        context: .
+        dockerfile: Shop.Inventory.API/Dockerfile
+    ports:
+        - '7080:80'
+    depends_on:
+        - 'postgres'
+        - 'rabbitmq' 
+    profiles: ["full", "inventory"]
+
+  postgres:
+    ports:
+      - '7777:5432'
+    container_name: shop-db
+    image: 'postgres:12'
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=shop
+      - POSTGRES_PASSWORD=shop
+      - POSTGRES_DB=shop
+    profiles: ["infra", "full", "api"] 
+  
+  postgres-inventory:
+    ports:
+      - '7778:5432'
+    container_name: shop-inventory-db
+    image: 'postgres:12'
+    volumes:
+      - ./postgres-inventory:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=shop
+      - POSTGRES_PASSWORD=shop
+      - POSTGRES_DB=shop-inventory
+    profiles: ["infra", "full", "inventory"]
+
+  rabbitmq:
+    ports:
+      - '15672:15672'
+      - '5672:5672'
+    container_name: shop-mq
+    image: 'rabbitmq:3-management'
+    hostname: shop-mq
+    volumes:
+      - ./.containers/queue/data/:/var/lib/rabbitmq
+      - ./.containers/queue/log/:/var/log/rabbitmq
+    environment:
+      RABBIT_MQ_DEFAULT_USER: guest
+      RABBIT_MQ_DEFAULT_PASS: guest
+    profiles: ["infra", "full", "api", "inventory"]
