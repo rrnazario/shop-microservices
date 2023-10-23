@@ -96,24 +96,29 @@ public static class InfrastructureDI
             });
 
             config.AddSagaStateMachine<BuyProductStateMachine, BuyProductState>()
+#if DEBUG
+
+            .InMemoryRepository();
+#else
             .EntityFrameworkRepository(opt =>
-            {
-                var connectionString = builder.Configuration
-                    .GetConnectionString(EFPersistenceOptions.PersistenceSection);
+             {
+                 var connectionString = builder.Configuration
+                     .GetConnectionString(EFPersistenceOptions.PersistenceSection);
 
-                opt.ConcurrencyMode = ConcurrencyMode.Pessimistic;
+                 opt.ConcurrencyMode = ConcurrencyMode.Pessimistic;
 
-                opt.AddDbContext<DbContext, BuyProductStateMachineContext>((provider, builder) =>
-                {
-                    builder.UseNpgsql(
-                        connectionString,
-                        m =>
-                        {
-                            m.MigrationsAssembly(Assembly.GetExecutingAssembly().GetName().Name);
-                            m.MigrationsHistoryTable($"__{nameof(BuyProductStateMachineContext)}");
-                        });
-                });
-            });
+                 opt.AddDbContext<DbContext, BuyProductStateMachineContext>((provider, builder) =>
+                 {
+                     builder.UseNpgsql(
+                         connectionString,
+                         m =>
+                         {
+                             m.MigrationsAssembly(Assembly.GetExecutingAssembly().GetName().Name);
+                             m.MigrationsHistoryTable($"__{nameof(BuyProductStateMachineContext)}");
+                         });
+                 });
+             });
+#endif
         });
     }
 }

@@ -23,16 +23,6 @@ public static class GetProduct
         {
             using var session = await _store.LightweightSerializableSessionAsync();
 
-            //var document = await session
-            //    .Query<Product>()
-            //    .FirstOrDefaultAsync(p => p.ProductId == request.Id);
-
-            //if (document is null)
-            //{
-            //    //TODO: proper threatment for this
-            //    throw new Exception("Not found");
-            //}
-
             var product = await session.Events.AggregateStreamAsync<Product>(
                 request.Id,
                 token: cancellationToken);

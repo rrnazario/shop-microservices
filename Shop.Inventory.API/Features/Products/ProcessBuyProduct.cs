@@ -24,7 +24,7 @@ public class ProcessBuyConsumer : IConsumer<ProcessBuy>
 
         if (product is null)
         {
-            throw new Exception("Not found");
+            throw new Exception("Product not found.");
         }
 
         product.TakeFromStock(context.Message.Amount);
