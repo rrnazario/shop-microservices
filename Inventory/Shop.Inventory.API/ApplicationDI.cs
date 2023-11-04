@@ -7,7 +7,7 @@ using Shop.Common;
 using Shop.Inventory.API.Features.Products;
 using System.Reflection;
 
-namespace Shop.Inventory.DI;
+namespace Shop.Inventory.API;
 
 public static partial class ApplicationDI
 {
@@ -15,7 +15,7 @@ public static partial class ApplicationDI
     /// <summary>
     /// Will register Carter, Swagger, APIVersioning and Mediator properly
     /// </summary>
-    public static void AddApplicationDependencies(this WebApplicationBuilder builder)
+    public static void AddApplication(this WebApplicationBuilder builder)
     {
         builder.Services.AddSwaggerGen(options =>
         {
@@ -61,7 +61,7 @@ public static partial class ApplicationDI
             config.AddConsumer<ProductCreatedConsumer>();
             config.AddConsumer<ProcessBuyConsumer>();
         });
-    }    
+    }
 
     public static void UseApplication(this WebApplication app)
     {

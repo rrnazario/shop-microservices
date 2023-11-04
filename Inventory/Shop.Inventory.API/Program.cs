@@ -1,9 +1,9 @@
-using Shop.Inventory.DI;
-using Shop.Inventory.Infrastructure.DI;
+using Shop.Inventory.API;
+using Shop.Inventory.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddApplicationDependencies();
+builder.AddApplication();
 builder.AddPersistence();
 
 builder.Services.AddEndpointsApiExplorer();

@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Shop.Inventory.Domain.Products;
 
-namespace Shop.Inventory.Infrastructure.DI;
+namespace Shop.Inventory.Infrastructure;
 
 public static class PersistenceDI
 {
@@ -34,6 +34,8 @@ public static class PersistenceDI
             options.Schema.For<Product>().DocumentAlias(nameof(Product));
         });
     }
+
+
 }
 
 record ESPersistenceOptions(

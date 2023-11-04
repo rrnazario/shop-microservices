@@ -6,7 +6,7 @@ using Shop.Domain.SeedWork;
 using Shop.Infrastructure.Model;
 using Shop.Infrastructure.Persistence;
 
-namespace Shop.Infrastructure.Jobs;
+namespace Shop.Infrastructure.Outbox;
 
 [DisallowConcurrentExecution]
 public sealed class OutboxMessagesProcessorJob : IJob
@@ -45,7 +45,7 @@ public sealed class OutboxMessagesProcessorJob : IJob
             }
 
             await _publisher.Publish(domainEvent);
-            
+
             message.ProcessedAt = DateTime.UtcNow;
         }
 

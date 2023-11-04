@@ -11,7 +11,7 @@ using Shop.Common.StateMachines;
 using Shop.Domain.Products;
 using Shop.Domain.SeedWork;
 using Shop.Infrastructure;
-using Shop.Infrastructure.Jobs;
+using Shop.Infrastructure.Outbox;
 using Shop.Infrastructure.Persistence;
 using Shop.Infrastructure.Repositories;
 
@@ -45,8 +45,6 @@ public static class InfrastructureDI
             builder.Services.AddQuartzHostedService();
         }
     }
-
-
 
     private static void AddDatabaseContext(this WebApplicationBuilder builder)
     {
