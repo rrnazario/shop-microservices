@@ -24,8 +24,7 @@ public class BuyProductModule : ICarterModule
             return Results.Ok();
           })
           .IncludeInOpenApi()
-          .Produces(StatusCodes.Status201Created)
-          .ProducesProblem(StatusCodes.Status401Unauthorized)
-          .ProducesProblem(StatusCodes.Status422UnprocessableEntity);
+          .Produces(StatusCodes.Status200OK)
+          .ProducesProblem(StatusCodes.Status400BadRequest);
 
 }

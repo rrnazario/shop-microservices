@@ -91,7 +91,6 @@ public class AddProductModule : ICarterModule
             })
            .IncludeInOpenApi()
            .Produces<AddProduct.Response>(StatusCodes.Status201Created)
-           .ProducesProblem(StatusCodes.Status401Unauthorized)
            .ProducesProblem(StatusCodes.Status422UnprocessableEntity);    
 }
 

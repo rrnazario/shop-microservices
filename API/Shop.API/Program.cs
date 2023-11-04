@@ -1,9 +1,9 @@
-using Shop.API.DI;
-using Shop.Infrastructure.DI;
+using Shop.API;
+using Shop.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.PerformConfigurations();
+builder.AddAplication();
 builder.AddInfrastructure();
 
 builder.Services.AddEndpointsApiExplorer();
@@ -12,6 +12,6 @@ var app = builder.Build();
 
 app.UseHttpsRedirection();
 
-app.UseConfigurations();
+app.UseApplication();
 
 app.Run();
