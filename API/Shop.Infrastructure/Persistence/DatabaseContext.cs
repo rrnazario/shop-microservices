@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Shop.Domain.Model;
+using Shop.Domain.Products;
 using OutboxMessage = Shop.Infrastructure.Model.OutboxMessage;
 
 namespace Shop.Infrastructure.Persistence;

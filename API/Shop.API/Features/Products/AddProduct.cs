@@ -4,8 +4,7 @@ using FluentValidation;
 using MassTransit;
 using MediatR;
 using Shop.Common.Contracts;
-using Shop.Domain.Interfaces;
-using Shop.Domain.Model;
+using Shop.Domain.Products;
 using Shop.Domain.SeedWork;
 using Shop.Infrastructure.Persistence;
 

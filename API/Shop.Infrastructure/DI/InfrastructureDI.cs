@@ -8,7 +8,7 @@ using Quartz;
 using Shop.Common;
 using Shop.Common.Configurations;
 using Shop.Common.StateMachines;
-using Shop.Domain.Interfaces;
+using Shop.Domain.Products;
 using Shop.Domain.SeedWork;
 using Shop.Infrastructure.Jobs;
 using Shop.Infrastructure.Persistence;

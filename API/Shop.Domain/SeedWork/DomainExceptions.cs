@@ -1,9 +1,7 @@
-﻿using Shop.Domain.SeedWork;
-
-namespace Shop.Domain.Exceptions;
+﻿namespace Shop.Domain.SeedWork;
 
 public class EntityAlreadyExistsException<T> : Exception
-    where T: Entity
+    where T : Entity
 {
     public EntityAlreadyExistsException(Guid id)
         : base($"{typeof(T).Name} with Id = {id} already exists") { }

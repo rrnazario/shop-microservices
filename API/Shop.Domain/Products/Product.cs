@@ -1,6 +1,6 @@
 ﻿using Shop.Domain.SeedWork;
 
-namespace Shop.Domain.Model;
+namespace Shop.Domain.Products;
 
 public class Product
     : Entity, IAggregate
@@ -14,9 +14,7 @@ public class Product
         Description = description;
 
         RaiseEvent(new ProductCreatedEvent(name, description));
-    }    
+    }
 }
 
-record NameChangedEvent(string Name) : IDomainEvent;
-record DescriptionChangedEvent(string Description) : IDomainEvent;
 record ProductCreatedEvent(string name, string Description) : IDomainEvent;

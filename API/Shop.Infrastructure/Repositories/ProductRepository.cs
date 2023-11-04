@@ -1,6 +1,5 @@
-﻿using Shop.Domain.Exceptions;
-using Shop.Domain.Interfaces;
-using Shop.Domain.Model;
+﻿using Shop.Domain.Products;
+using Shop.Domain.SeedWork;
 using Shop.Infrastructure.Persistence;
 
 namespace Shop.Infrastructure.Repositories;
