@@ -1,33 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Shop.Domain.Products;
-using OutboxMessage = Shop.Infrastructure.Model.OutboxMessage;
+using Shop.Infrastructure.Model;
 
 namespace Shop.Infrastructure.Persistence;
-
-//public sealed class DatabaseContext : SagaDbContext
-//{
-//    public DbSet<Product> Products { get; set; }
-
-//    protected override IEnumerable<ISagaClassMap> Configurations => throw new NotImplementedException();
-
-//    public DatabaseContext(DbContextOptions<DatabaseContext> options)
-//        : base(options) { }
-
-//    protected override void OnModelCreating(ModelBuilder modelBuilder)
-//    {
-//        modelBuilder.Entity<Product>();
-
-//        base.OnModelCreating(modelBuilder);
-//    }
-//}
-
-//public class StateMachineMap : SagaClassMap<OrderStateInstance>
-//{
-//    protected override void Configure(EntityTypeBuilder<OrderStateInstance> entity, ModelBuilder model)
-//    {
-//        base.Configure(entity, model);
-//    }
-//}
 
 public sealed class DatabaseContext : DbContext
 {
@@ -39,8 +14,17 @@ public sealed class DatabaseContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Product>();
-        modelBuilder.Entity<OutboxMessage>();
+        modelBuilder.Entity<Product>(product =>
+        {
+            product.HasKey(_ => _.Id);
+            product.Property(_ => _.Id).ValueGeneratedOnAdd();
+        });
+
+        modelBuilder.Entity<OutboxMessage>(outbox =>
+        {
+            outbox.HasKey(_ => _.Id);
+            outbox.Property(_ => _.Id).ValueGeneratedOnAdd();
+        });
 
         base.OnModelCreating(modelBuilder);
     }
