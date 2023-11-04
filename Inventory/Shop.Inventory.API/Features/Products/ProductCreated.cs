@@ -1,7 +1,7 @@
 ﻿using Marten;
 using MassTransit;
 using Shop.Common.Contracts;
-using Shop.Inventory.Domain.Model;
+using Shop.Inventory.Domain.Products;
 
 namespace Shop.Inventory.API.Features.Products;
 

@@ -1,4 +1,4 @@
-﻿namespace Shop.Inventory.Domain.Model;
+﻿namespace Shop.Inventory.Domain.Products;
 
 public record Stock
 {

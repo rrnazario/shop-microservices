@@ -2,7 +2,7 @@
 using Carter.OpenApi;
 using Marten;
 using MediatR;
-using Shop.Inventory.Domain.Model;
+using Shop.Inventory.Domain.Products;
 
 namespace Shop.Inventory.API.Features.Products;
 

@@ -1,6 +1,6 @@
 ﻿using Shop.Inventory.Domain.SeedWork;
 
-namespace Shop.Inventory.Domain.Model
+namespace Shop.Inventory.Domain.Products
 {
     public class Product
         : Entity, IAggregate
@@ -54,7 +54,7 @@ namespace Shop.Inventory.Domain.Model
 
         void Apply(StockAmountTaken evt)
         {
-            if ((ProductStock.Amount - evt.AmountTaken) <= 0)
+            if (ProductStock.Amount - evt.AmountTaken <= 0)
             {
                 throw new Exception("Stock not available");
             }

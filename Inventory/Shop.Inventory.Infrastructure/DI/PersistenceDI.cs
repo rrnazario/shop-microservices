@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Shop.Inventory.Domain.Model;
+using Shop.Inventory.Domain.Products;
 
 namespace Shop.Inventory.Infrastructure.DI;
 
