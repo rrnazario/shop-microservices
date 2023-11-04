@@ -5,7 +5,7 @@ services:
     image: 'shop-api'
     build:
       context: .
-      dockerfile: Shop.API/Dockerfile
+      dockerfile: API/Shop.API/Dockerfile
     ports:
       - '9080:80'
     depends_on:
@@ -18,7 +18,7 @@ services:
     image: 'shop-inventory'
     build:
         context: .
-        dockerfile: Shop.Inventory.API/Dockerfile
+        dockerfile: Inventory/Shop.Inventory.API/Dockerfile
     ports:
         - '7080:80'
     depends_on:
