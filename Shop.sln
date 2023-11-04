@@ -16,16 +16,22 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "API", "API", "{8B06E445-76FA-4146-814E-47A115A13508}"
+	ProjectSection(SolutionItems) = preProject
+		API\Shop.API\README.md = API\Shop.API\README.md
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Inventory", "Inventory", "{E1C5D08F-6B69-4E78-A671-813F1FE2FC31}"
+	ProjectSection(SolutionItems) = preProject
+		Inventory\Shop.Inventory.API\README.md = Inventory\Shop.Inventory.API\README.md
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shop.Domain", "API\Shop.Domain\Shop.Domain.csproj", "{4283088B-2DB9-44AE-8785-3B3A23B3E48C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shop.Infrastructure", "API\Shop.Infrastructure\Shop.Infrastructure.csproj", "{B1E89BE1-6667-47C6-B097-DD39A8DC5204}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shop.Inventory.Domain", "Inventory\Shop.Inventory.Domain\Shop.Inventory.Domain.csproj", "{FC84A085-08A4-47D3-A0E2-A4AD484AC4B0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shop.Inventory.Domain", "Inventory\Shop.Inventory.Domain\Shop.Inventory.Domain.csproj", "{FC84A085-08A4-47D3-A0E2-A4AD484AC4B0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shop.Inventory.Infrastructure", "Inventory\Shop.Inventory.Infrastructure\Shop.Inventory.Infrastructure.csproj", "{E3C9F1B0-0B25-40FD-BEA8-6D1E0FA02CE0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shop.Inventory.Infrastructure", "Inventory\Shop.Inventory.Infrastructure\Shop.Inventory.Infrastructure.csproj", "{E3C9F1B0-0B25-40FD-BEA8-6D1E0FA02CE0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
