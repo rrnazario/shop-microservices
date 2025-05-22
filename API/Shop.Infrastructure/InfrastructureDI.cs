@@ -19,6 +19,14 @@ namespace Shop.Infrastructure;
 
 public static class InfrastructureDI
 {
+    public static void TryApplyMigrations(this WebApplication app)
+    {
+        using var scope = app.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
+
+        dbContext.Database.Migrate();
+    }
+    
     public static void AddInfrastructure(this WebApplicationBuilder builder)
     {
         builder.AddDatabaseContext();
@@ -28,7 +36,7 @@ public static class InfrastructureDI
         builder.AddRepositories();
         builder.AddMassTransit();
 
-        if (!builder.Environment.IsDevelopment())
+        //if (!builder.Environment.IsDevelopment())
         {
             builder.Services.AddQuartz(config =>
             {

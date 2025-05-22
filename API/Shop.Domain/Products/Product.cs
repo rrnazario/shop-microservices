@@ -13,8 +13,8 @@ public class Product
         Name = name;
         Description = description;
 
-        RaiseEvent(new ProductCreatedEvent(name, description));
+        RaiseEvent(new ProductCreatedDomainEvent(name, description));
     }
 }
 
-record ProductCreatedEvent(string name, string Description) : IDomainEvent;
+record ProductCreatedDomainEvent(string name, string Description) : IDomainEvent;

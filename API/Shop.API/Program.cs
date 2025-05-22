@@ -13,5 +13,6 @@ var app = builder.Build();
 app.UseHttpsRedirection();
 
 app.UseApplication();
+app.TryApplyMigrations();
 
 app.Run();

@@ -32,15 +32,16 @@ public sealed class OutboxMessagesProcessorJob : IJob
 
         foreach (var message in messages)
         {
+            Console.WriteLine($"Processing message {message.Id}");
             var domainEvent = JsonConvert
                 .DeserializeObject<IDomainEvent>(message.Content!, new JsonSerializerSettings
                 {
-                    TypeNameHandling = TypeNameHandling.All
+                    TypeNameHandling = TypeNameHandling.All,
                 });
 
             if (domainEvent is null)
             {
-                //TODO: to log the exception
+                Console.Error.WriteLine("Failed to deserialize domain event");
                 continue;
             }
 

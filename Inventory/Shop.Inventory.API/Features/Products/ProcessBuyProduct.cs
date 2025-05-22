@@ -16,7 +16,7 @@ public class ProcessBuyConsumer : IConsumer<ProcessBuy>
 
     public async Task Consume(ConsumeContext<ProcessBuy> context)
     {
-        using var session = await _store.LightweightSerializableSessionAsync();
+        await using var session = await _store.LightweightSerializableSessionAsync();
 
         var product = await session.Events.AggregateStreamAsync<Product>(
                 context.Message.ProductId,

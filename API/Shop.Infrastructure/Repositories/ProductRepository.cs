@@ -16,7 +16,7 @@ public class ProductRepository
 
     public async Task<Guid> AddAsync(Product entity, CancellationToken cancellationToken = default)
     {
-        var product = await _databaseContext.FindAsync<Product>(entity.Id);
+        var product = await _databaseContext.FindAsync<Product>(entity.Id, cancellationToken);
 
         if (product is not null)
         {

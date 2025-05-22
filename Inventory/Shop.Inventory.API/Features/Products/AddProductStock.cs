@@ -6,11 +6,11 @@ using Shop.Inventory.Domain.Products;
 
 namespace Shop.Inventory.API.Features.Products;
 
-public static class GetProduct
+public static class AddProductStock
 {
-    internal record Query(Guid Id) : IRequest<Product>;
+    internal record Command(Guid Id, int Amount) : IRequest;
 
-    private record Handler : IRequestHandler<Query, Product>
+    private record Handler : IRequestHandler<Command>
     {
         private readonly IDocumentStore _store;
 
@@ -19,10 +19,10 @@ public static class GetProduct
             _store = store;
         }
 
-        public async Task<Product> Handle(Query request, CancellationToken cancellationToken)
+        public async Task Handle(Command request, CancellationToken cancellationToken)
         {
             await using var session = await _store.LightweightSerializableSessionAsync(cancellationToken);
-
+            
             var product = await session.Events.AggregateStreamAsync<Product>(
                 request.Id,
                 token: cancellationToken);
@@ -33,25 +33,28 @@ public static class GetProduct
                 throw new Exception("Not found");
             }
 
-            return product!;
+            product.AddStock(request.Amount);
+            
+            session.Events.Append(product.Id, product.GetEventsList());
+
+            await session.SaveChangesAsync(cancellationToken);
+            
+            product.ClearEvents();
         }
     }
 }
 
-public class GetProductModule : ICarterModule
+public class AddProductStockModule : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet(
-            "/products/{id}",
-            async (Guid id, ISender sender) =>
+        app.MapPut(
+            "/products/{id}/{amount}",
+            async (Guid id, int amount, ISender sender) =>
             {
-                var result = await sender.Send(new GetProduct.Query(id));
-
-                return Results.Ok(result);
+                await sender.Send(new AddProductStock.Command(id, amount));
             })
             .IncludeInOpenApi()
-            .Produces<Product>()
-            .Produces(StatusCodes.Status404NotFound);
+            .Produces(StatusCodes.Status200OK);
     }
 }

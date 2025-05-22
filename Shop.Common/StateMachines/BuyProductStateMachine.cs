@@ -3,10 +3,12 @@
 namespace Shop.Common.StateMachines;
 
 public record StartBuy(Guid CorrelationId, int Amount) : CorrelatedBy<Guid>;
-public record ProcessBuy(Guid ProductId, Guid ProcessingId, int Amount);
-public record BuyProcessed(Guid ProductId);
-public record BuyCancelled(Guid ProductId, string Reason);
 
+public record ProcessBuy(Guid ProductId, Guid ProcessingId, int Amount);
+
+public record BuyProcessed(Guid ProductId);
+
+public record BuyCancelled(Guid ProductId, string Reason);
 
 public class BuyProductState : SagaStateMachineInstance
 {
@@ -29,7 +31,7 @@ public class BuyProductStateMachine
 
     public Event<StartBuy> BuyStarted { get; set; }
 
-    public Request<BuyProductState, ProcessBuy, BuyProcessed> ProcessBuy { get; set; }
+    public Request<BuyProductState, ProcessBuy, BuyProcessed> ProcessBuyRequest { get; set; }
 
     public BuyProductStateMachine()
     {
@@ -37,63 +39,65 @@ public class BuyProductStateMachine
 
         Event(() => BuyStarted);
 
-        Request(() => ProcessBuy, order => order.ProcessingId, config => { config.Timeout = TimeSpan.Zero; });
+        Request(() => ProcessBuyRequest, order => order.ProcessingId, config => { config.Timeout = TimeSpan.Zero; });
 
         Initially(
             When(BuyStarted)
-            .Then(ctx =>
-            {
-                ctx.Saga.ProcessingId = Guid.NewGuid();
-                ctx.Saga.RequestId = ctx.RequestId;
+                .Then(ctx =>
+                {
+                    ctx.Saga.ProcessingId = Guid.NewGuid();
+                    ctx.Saga.RequestId = ctx.RequestId;
 
-                ctx.Saga.ProductId = ctx.Message.CorrelationId;
-                ctx.Saga.Amount = ctx.Message.Amount;
-                ctx.Saga.ResponseAddress = ctx.ResponseAddress!;
-            })
-            .Request(
-                ProcessBuy,
-                context => new ProcessBuy(context.Saga.ProductId, (Guid)context.Saga.ProcessingId!, context.Saga.Amount))
-            .TransitionTo(ProcessBuy!.Pending));
+                    ctx.Saga.ProductId = ctx.Message.CorrelationId;
+                    ctx.Saga.Amount = ctx.Message.Amount;
+                    ctx.Saga.ResponseAddress = ctx.ResponseAddress!;
+                })
+                .Request(
+                    ProcessBuyRequest,
+                    context => new ProcessBuy(context.Saga.ProductId, (Guid)context.Saga.ProcessingId!,
+                        context.Saga.Amount))
+                .TransitionTo(ProcessBuyRequest!.Pending));
 
-        During(ProcessBuy.Pending,
+        During(ProcessBuyRequest.Pending,
+            When(ProcessBuyRequest.Completed)
+                .TransitionTo(Accepted)
+                .ThenAsync(async context =>
+                {
+                    var endpoint =
+                        await context.GetResponseEndpoint<BuyProcessed>(context.Saga.ResponseAddress,
+                            context.Saga.RequestId);
 
-            When(ProcessBuy.Completed)
-            .TransitionTo(Accepted)
-            .ThenAsync(async context =>
-            {
-                var endpoint = await context.GetResponseEndpoint<BuyProcessed>(context.Saga.ResponseAddress, context.Saga.RequestId);
+                    await endpoint.Send(new BuyProcessed(context.Saga.ProductId));
+                })
+                .Finalize(),
+            When(ProcessBuyRequest.Faulted)
+                .TransitionTo(Failed)
+                .ThenAsync(async context =>
+                {
+                    var endpoint =
+                        await context.GetResponseEndpoint<BuyCancelled>(context.Saga.ResponseAddress,
+                            context.Saga.RequestId);
 
-                await endpoint.Send(new BuyProcessed(context.Saga.ProductId));
-            })
-            .Finalize(),
+                    var message = string.Join("\n", context.Message.Exceptions.Select(e => e.Message));
 
-            When(ProcessBuy.Faulted)
-            .TransitionTo(Failed)
-            .ThenAsync(async context =>
-            {
-                var endpoint = await context.GetResponseEndpoint<BuyCancelled>(context.Saga.ResponseAddress, context.Saga.RequestId);
+                    await endpoint.Send(new BuyCancelled(context.Saga.ProductId, message),
+                        r => r.RequestId = context.Saga.RequestId);
+                })
+                .Finalize(),
+            When(ProcessBuyRequest.TimeoutExpired)
+                .TransitionTo(Failed)
+                .ThenAsync(async context =>
+                {
+                    var endpoint =
+                        await context.GetResponseEndpoint<BuyCancelled>(context.Saga.ResponseAddress,
+                            context.Saga.RequestId);
 
-                var message = string.Join("\n", context.Message.Exceptions.Select(e => e.Message));
-
-                await endpoint.Send(new BuyCancelled(context.Saga.ProductId, message),
-                    r => r.RequestId = context.Saga.RequestId);
-            })
-            .Finalize(),
-
-            When(ProcessBuy.TimeoutExpired)
-            .TransitionTo(Failed)
-            .ThenAsync(async context =>
-            {
-                var endpoint = await context.GetResponseEndpoint<BuyCancelled>(context.Saga.ResponseAddress, context.Saga.RequestId);
-
-                await endpoint.Send(new BuyCancelled(context.Saga.ProductId, "Timed out"),
-                    r => r.RequestId = context.Saga.RequestId);
-            })
-            .Finalize(),
-
+                    await endpoint.Send(new BuyCancelled(context.Saga.ProductId, "Timed out"),
+                        r => r.RequestId = context.Saga.RequestId);
+                })
+                .Finalize(),
             Ignore(BuyStarted)
-
-            );
+        );
 
         SetCompletedWhenFinalized();
     }
