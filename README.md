@@ -3,7 +3,7 @@ A microservice approach with Carter minimal APIs and different storage strategie
 
 ## Components
 
-- .NET 7
+- .NET 9
 - Carten
 - MassTransit
 - MartenDB
