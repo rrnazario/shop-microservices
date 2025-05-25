@@ -1,16 +1,16 @@
-﻿using MassTransit;
+﻿using System.Reflection;
+using MassTransit;
+using MassTransit.EntityFrameworkCoreIntegration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Quartz;
 using Shop.Common;
 using Shop.Common.Configurations;
 using Shop.Common.StateMachines;
 using Shop.Domain.Products;
 using Shop.Domain.SeedWork;
-using Shop.Infrastructure;
 using Shop.Infrastructure.Outbox;
 using Shop.Infrastructure.Persistence;
 using Shop.Infrastructure.Repositories;
@@ -23,10 +23,12 @@ public static class InfrastructureDI
     {
         using var scope = app.Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
-
         dbContext.Database.Migrate();
+
+        var sagaContext = scope.ServiceProvider.GetRequiredService<BuyProductStateMachineContext>();
+        sagaContext.Database.Migrate();
     }
-    
+
     public static void AddInfrastructure(this WebApplicationBuilder builder)
     {
         builder.AddDatabaseContext();
@@ -43,11 +45,11 @@ public static class InfrastructureDI
                 var jobKey = new JobKey(nameof(OutboxMessagesProcessorJob));
 
                 config
-                .AddJob<OutboxMessagesProcessorJob>(jobKey)
-                .AddTrigger(trigger =>
-                    trigger
-                    .ForJob(jobKey)
-                    .WithSimpleSchedule(schedule => schedule.WithIntervalInSeconds(5).RepeatForever()));
+                    .AddJob<OutboxMessagesProcessorJob>(jobKey)
+                    .AddTrigger(trigger =>
+                        trigger
+                            .ForJob(jobKey)
+                            .WithSimpleSchedule(schedule => schedule.WithIntervalInHours(5).RepeatForever()));
             });
 
             builder.Services.AddQuartzHostedService();
@@ -56,15 +58,15 @@ public static class InfrastructureDI
 
     private static void AddDatabaseContext(this WebApplicationBuilder builder)
     {
-        builder.Services.AddDbContext<DatabaseContext>(ctx =>
-        {
-            var connectionString = builder.Configuration
+        var connectionString = builder.Configuration
             .GetConnectionString(EFPersistenceOptions.PersistenceSection);
 
-            var options = builder.Configuration
-                    .GetSection(EFPersistenceOptions.PersistenceSection)
-                    .Get<EFPersistenceOptions>()!;
+        var options = builder.Configuration
+            .GetSection(EFPersistenceOptions.PersistenceSection)
+            .Get<EFPersistenceOptions>()!;
 
+        builder.Services.AddDbContext<DatabaseContext>(ctx =>
+        {
             ctx.UseNpgsql(connectionString, action =>
             {
                 action.EnableRetryOnFailure(options.MaxRetryCount);
@@ -73,6 +75,15 @@ public static class InfrastructureDI
 
             ctx.EnableDetailedErrors(options.EnableDetailedErrors);
             ctx.EnableSensitiveDataLogging(options.EnableSensitiveDataLogging);
+        });
+
+        builder.Services.AddDbContext<BuyProductStateMachineContext>(ctx =>
+        {
+            ctx.UseNpgsql(connectionString, action =>
+            {
+                action.MigrationsAssembly(Assembly.GetExecutingAssembly().GetName().Name);
+                action.MigrationsHistoryTable($"__{nameof(JobServiceSagaDbContext)}");
+            });
         });
 
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -102,29 +113,16 @@ public static class InfrastructureDI
             });
 
             config.AddSagaStateMachine<BuyProductStateMachine, BuyProductState>()
-#if DEBUG
-
-            .InMemoryRepository();
-#else
-            .EntityFrameworkRepository(opt =>
-             {
-                 var connectionString = builder.Configuration
-                     .GetConnectionString(EFPersistenceOptions.PersistenceSection);
-
-                 opt.ConcurrencyMode = ConcurrencyMode.Pessimistic;
-
-                 opt.AddDbContext<DbContext, BuyProductStateMachineContext>((provider, builder) =>
-                 {
-                     builder.UseNpgsql(
-                         connectionString,
-                         m =>
-                         {
-                             m.MigrationsAssembly(Assembly.GetExecutingAssembly().GetName().Name);
-                             m.MigrationsHistoryTable($"__{nameof(BuyProductStateMachineContext)}");
-                         });
-                 });
-             });
-#endif
+// #if DEBUG
+//
+//             .InMemoryRepository();
+// #else
+                .EntityFrameworkRepository(opt =>
+                {
+                    opt.ExistingDbContext<BuyProductStateMachineContext>();
+                    opt.UsePostgres();
+                });
+//#endif
         });
     }
 }

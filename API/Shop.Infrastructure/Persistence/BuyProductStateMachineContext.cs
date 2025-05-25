@@ -9,7 +9,7 @@ namespace Shop.Infrastructure.Persistence;
 public sealed class BuyProductStateMachineContext 
     : SagaDbContext
 {
-    public BuyProductStateMachineContext(DbContextOptions<DbContext> options)
+    public BuyProductStateMachineContext(DbContextOptions<BuyProductStateMachineContext> options)
         : base(options) { }
 
     protected override IEnumerable<ISagaClassMap> Configurations

@@ -14,7 +14,7 @@ public class BuyProductState : SagaStateMachineInstance
 {
     public Guid CorrelationId { get; set; }
     public Guid? RequestId { get; set; }
-    public string? CurrentState { get; set; }
+    public int CurrentState { get; set; }
     public Guid? ProcessingId { get; set; }
     public Guid ProductId { get; set; }
     public int Amount { get; set; }
@@ -35,7 +35,7 @@ public class BuyProductStateMachine
 
     public BuyProductStateMachine()
     {
-        InstanceState(m => m.CurrentState);
+        InstanceState(m => m.CurrentState, Started, Accepted, Failed);
 
         Event(() => BuyStarted);
 
@@ -45,7 +45,7 @@ public class BuyProductStateMachine
             When(BuyStarted)
                 .Then(ctx =>
                 {
-                    ctx.Saga.ProcessingId = Guid.NewGuid();
+                    ctx.Saga.ProcessingId = Guid.CreateVersion7();
                     ctx.Saga.RequestId = ctx.RequestId;
 
                     ctx.Saga.ProductId = ctx.Message.CorrelationId;

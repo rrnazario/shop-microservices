@@ -17,7 +17,7 @@ public sealed class ProductCreatedConsumer
 
     public async Task Consume(ConsumeContext<ProductCreatedIntegrationEvent> context)
     {
-        using var session = await _store.LightweightSerializableSessionAsync();
+        await using var session = await _store.LightweightSerializableSessionAsync();
 
         var product = new Product(context.Message.Id, context.Message.Name, context.Message.Description);
 

@@ -31,7 +31,7 @@ public static class PersistenceDI
                 });
             }
 
-            options.Schema.For<Product>().DocumentAlias(nameof(Product));
+            options.Schema.For<Product>().DatabaseSchemaName(nameof(Product));
         });
     }
 
