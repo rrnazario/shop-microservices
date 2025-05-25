@@ -5,7 +5,6 @@
 - To start the infra
 ```
 docker compose --profile infra up -d
-dotnet ef database update --project Shop.Inventory.Infrastructure  -s Shop.Inventory.API
 ```
 
 - To add a migration (e.g.)
