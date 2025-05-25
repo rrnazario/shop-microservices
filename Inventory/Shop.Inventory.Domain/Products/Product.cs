@@ -24,7 +24,7 @@ public partial class Product
         RaiseEvent(productIdEvent);
         Apply(productIdEvent);
 
-        var nameChanged = new NameChangedEvent(name);
+        var nameChanged = new ProductNameChangedEvent(name);
         RaiseEvent(nameChanged);
         Apply(nameChanged);
 

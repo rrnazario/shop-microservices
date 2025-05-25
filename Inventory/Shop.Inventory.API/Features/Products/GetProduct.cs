@@ -12,19 +12,16 @@ public static class GetProduct
 
     private record Handler : IRequestHandler<Query, Product>
     {
-        private readonly IDocumentStore _store;
+        private readonly IQuerySession _session;
 
-        public Handler(IDocumentStore store)
+        public Handler(IQuerySession session)
         {
-            _store = store;
+            _session = session;
         }
 
         public async Task<Product> Handle(Query request, CancellationToken cancellationToken)
         {
-            await using var session = await _store.LightweightSerializableSessionAsync(cancellationToken);
-
-            var product = await session.Events.AggregateStreamAsync<Product>(
-                request.Id,
+            var product = await _session.LoadAsync<Product>(request.Id,
                 token: cancellationToken);
 
             if (product is null)

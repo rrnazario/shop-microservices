@@ -1,4 +1,5 @@
 ﻿using Marten;
+using Marten.Events.Projections;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -32,6 +33,10 @@ public static class PersistenceDI
             }
 
             options.Schema.For<Product>().DatabaseSchemaName(nameof(Product));
+            options.Events
+                .MapEventType<ProductNameChangedEvent>("name_changed_event");
+
+            options.Projections.Add<ProductProjection>(ProjectionLifecycle.Inline);
         });
     }
 

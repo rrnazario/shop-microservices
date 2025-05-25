@@ -4,12 +4,12 @@ namespace Shop.Inventory.Domain.Products;
 
 public partial class Product
 {
-    private void Apply(StockAmountAdded evt)
+    public void Apply(StockAmountAdded evt)
     {
         ProductStock.Amount += evt.AmountAdded;
     }
 
-    private void Apply(StockAmountTaken evt)
+    public void Apply(StockAmountTaken evt)
     {
         if (ProductStock.Amount - evt.AmountTaken <= 0)
         {
@@ -19,13 +19,13 @@ public partial class Product
         ProductStock.Amount -= evt.AmountTaken;
     }
 
-    private void Apply(ProductCreatedEvent evt)
+    public void Apply(ProductCreatedEvent evt)
     {
         Id = evt.Id;
         ProductId = evt.ProductId;
     }
 
-    private void Apply(NameChangedEvent evt)
+    public void Apply(ProductNameChangedEvent evt)
     {
         if (!string.IsNullOrEmpty(evt.Name) &&
             !evt.Name.Equals(Name, StringComparison.CurrentCultureIgnoreCase))
@@ -34,7 +34,7 @@ public partial class Product
         }
     }
 
-    private void Apply(DescriptionChangedEvent evt)
+    public void Apply(DescriptionChangedEvent evt)
     {
         if (!string.IsNullOrEmpty(evt.Description) &&
             !evt.Description.Equals(Description, StringComparison.CurrentCultureIgnoreCase))
@@ -46,7 +46,7 @@ public partial class Product
 
 public record ProductCreatedEvent(Guid Id, Guid ProductId) : DomainEvent;
 
-public record NameChangedEvent(string Name) : DomainEvent;
+public record ProductNameChangedEvent(string Name) : DomainEvent;
 
 public record DescriptionChangedEvent(string Description) : DomainEvent;
 
